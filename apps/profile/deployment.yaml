@@ -23,7 +23,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: frontend
-          image: ghcr.io/THAY_OWNER/is402-profile@sha256:THAY_DIGEST
+          image: ghcr.io/minhtuan-k18/is402-profile@sha256:b1678c97d5fa588cb75c88f371ebe61714eccc36ac96205ab434abf08c885a95
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
