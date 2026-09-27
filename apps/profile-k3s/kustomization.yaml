@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../profile
+patches:
+  - target:
+      version: v1
+      kind: Service
+      name: profile
+    patch: |-
+      - op: replace
+        path: /spec/ports/0/port
+        value: 8088
+      - op: add
+        path: /metadata/annotations/is402.openstack.lab~1runtime
+        value: k3s-fallback

@@ -44,6 +44,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          kubectl kustomize apps/profile |
-            docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 \
-              -strict -summary
+          for overlay in apps/profile apps/profile-k3s; do
+            echo "Validating ${overlay}"
+            kubectl kustomize "${overlay}" |
+              docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 \
+                -strict -summary
+          done
