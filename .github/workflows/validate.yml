@@ -1,0 +1,49 @@
+name: Validate Kubernetes desired state
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.34.3
+
+      - name: Require one immutable application image
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          deployment = Path('apps/profile/deployment.yaml').read_text()
+          images = re.findall(r'^\s+image:\s*(\S+)\s*$', deployment, re.MULTILINE)
+          expected = r'ghcr\.io/minhtuan-k18/is402-profile@sha256:[0-9a-f]{64}'
+          if len(images) != 1:
+              raise SystemExit(f'Expected one image field, found {len(images)}')
+          if re.fullmatch(expected, images[0]) is None:
+              raise SystemExit(f'Image must be the expected immutable GHCR digest: {images[0]}')
+          print(f'Validated immutable image: {images[0]}')
+          PY
+
+      - name: Render and validate Kubernetes schemas
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl kustomize apps/profile |
+            docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 \
+              -strict -summary
