@@ -23,7 +23,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: frontend
-          image: ghcr.io/minhtuan-k18/is402-profile@sha256:3b7abb970802830cf32645369bb3431eb004b1baf615329b709e19895acb50e1
+          image: ghcr.io/minhtuan-k18/is402-profile@sha256:c93d6d319d45cc03bde126aabd17a3c02f230fb121d3ae87c2b974a60cf85d3c
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
